@@ -6,7 +6,7 @@ railWidth=20;
 // Width of the slot in the aluminum extrusion beam
 railSlotWidth=6.2;
 
-attachBlockThickness=8+0;
+attachBlockThickness=9.5+0;
 
 railSlotInsertLength=railSlotWidth*2/3;
 railSlotInsertDepth=railSlotWidth/3;
@@ -20,6 +20,11 @@ railAttachScrewHoleTolerance=0.5;
 
 // diameter of the bold used for clamping
 rodClampScrewHoleDia=2.5;
+
+// Percentage of the rodClampThickness to keep flat.
+rodClampFlatSidePercent=40;
+// Note: The rodClampFlatSidePercent helps avoid thin
+// heat-sensitive areas when printing.
 
 railSlotInsertWidth=railSlotWidth-railSlotInsertClearance*2;
 
@@ -50,10 +55,10 @@ rodClampEarGap=1;
 // Diameter of the CF rod to be used
 rodDia=6;
 
-rodTolerance=0.5;
+rodTolerance=0.25;
 
 // Amount of material between the rod and the edge
-rodClampInset=5;
+rodClampInset=7;
 
 // Top to bottom measurement for the rod clamp block
 rodClampThickness=10;
@@ -99,15 +104,19 @@ module rodClamp() {
     
     difference() {
         // fix minkowski shift across axes
+        rodClampEdgeFlatThickness=rodClampFlatSidePercent/100*rodClampThickness;
         translate([smoothnessRadius, smoothnessRadius, smoothnessRadius])
         minkowski() {
             hull() {
                 cube([rodClampLength-smoothnessRadius*2, 
-                    rodClampWidth-smoothnessRadius*2, overlap]);
+                    rodClampWidth-smoothnessRadius*2, 
+                        rodClampEdgeFlatThickness]);
                 translate([0, topSlopeTranslateY, 
-                        rodClampThickness-overlap-smoothnessRadius*2])
+                        rodClampThickness-rodClampEdgeFlatThickness
+                        -smoothnessRadius*2])
                     cube([rodClampLength-smoothnessRadius*2, 
-                        rodClampWidth-smoothnessRadius*2,overlap]);
+                        rodClampWidth-smoothnessRadius*2,
+                        rodClampEdgeFlatThickness]);
             }
             sphere(r=smoothnessRadius, $fn=20);
         }
