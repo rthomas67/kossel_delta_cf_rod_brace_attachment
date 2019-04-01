@@ -21,11 +21,6 @@ railAttachScrewHoleTolerance=0.5;
 // diameter of the bold used for clamping
 rodClampScrewHoleDia=2.5;
 
-// Percentage of the rodClampThickness to keep flat.
-rodClampFlatSidePercent=40;
-// Note: The rodClampFlatSidePercent helps avoid thin
-// heat-sensitive areas when printing.
-
 railSlotInsertWidth=railSlotWidth-railSlotInsertClearance*2;
 
 // Angle up/down from vertical for the brace rod
@@ -89,7 +84,7 @@ $fn=50+0;
 
 attachBlock();
 // position
-translate([railWidth/2,railWidth/2-rodClampWidth/2,0])
+translate([railWidth/2-smoothnessRadius,railWidth/2-rodClampWidth/2,0])
 // move back up after rotation to re-align bottom
 translate([0,0,attachBlockThickness])
 rotate([0,-rodRailAlignmentAngle,0])
@@ -104,19 +99,16 @@ module rodClamp() {
     
     difference() {
         // fix minkowski shift across axes
-        rodClampEdgeFlatThickness=rodClampFlatSidePercent/100*rodClampThickness;
         translate([smoothnessRadius, smoothnessRadius, smoothnessRadius])
         minkowski() {
             hull() {
                 cube([rodClampLength-smoothnessRadius*2, 
-                    rodClampWidth-smoothnessRadius*2, 
-                        rodClampEdgeFlatThickness]);
-                translate([0, topSlopeTranslateY, 
-                        rodClampThickness-rodClampEdgeFlatThickness
-                        -smoothnessRadius*2])
+                    rodClampWidth-smoothnessRadius*2,
+                    rodClampThickness-smoothnessRadius*2]);
+                translate([0, topSlopeTranslateY,0])
                     cube([rodClampLength-smoothnessRadius*2, 
                         rodClampWidth-smoothnessRadius*2,
-                        rodClampEdgeFlatThickness]);
+                        rodClampThickness-smoothnessRadius*2]);
             }
             sphere(r=smoothnessRadius, $fn=20);
         }
